@@ -2,18 +2,28 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.URI;
+import java.util.Set;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
 public class GeminiAPI {
-    public static Pergunta gerarPergunta() throws Exception {
-        String prompt = "Gere uma pergunta de conhecimentos gerais com 4 alternativas (3 erradas e 1 correta). Responda apenas no formato JSON: {\"pergunta\": \"...\", \"opcoes\": [\"...\", \"...\", \"...\", \"...\"], \"resposta\": \"...\"}";
+    public static Pergunta gerarPergunta(Set<String> perguntasFeitas) throws Exception {
+        StringBuilder prompt = new StringBuilder(
+                "Gere uma pergunta de conhecimentos gerais com 4 alternativas (3 erradas e 1 correta). " +
+                        "Responda apenas no formato JSON: {\"pergunta\": \"...\", \"opcoes\": [\"...\", \"...\", \"...\", \"...\"], \"resposta\": \"...\"}."
+        );
+        if (!perguntasFeitas.isEmpty()) {
+            prompt.append(" Não repita nenhuma destas perguntas já feitas: ");
+            for (String feita : perguntasFeitas) {
+                prompt.append("\"").append(feita).append("\", ");
+            }
+        }
 
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode part = mapper.createObjectNode();
-        part.put("text", prompt);
+        part.put("text", prompt.toString());
 
         ArrayNode partsArray = mapper.createArrayNode();
         partsArray.add(part);
@@ -38,7 +48,7 @@ public class GeminiAPI {
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        System.out.println("Resposta bruta da API Gemini:\n" + response.body());
+
 
         JsonNode root = mapper.readTree(response.body());
 
