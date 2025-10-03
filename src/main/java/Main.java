@@ -11,6 +11,9 @@ public class Main {
         System.out.print("Digite seu nome: ");
         String nome = scanner.nextLine().trim();
 
+        System.out.print("Digite o tema do quiz: ");
+        String tema = scanner.nextLine().trim();
+
         while (true) {
             Pergunta pergunta = null;
             int tentativas = 0;
@@ -19,7 +22,7 @@ public class Main {
 
             while (tentativas < maxTentativas) {
                 try {
-                    pergunta = GeminiAPI.gerarPergunta(perguntasFeitas);
+                    pergunta = GeminiAPI.gerarPergunta(perguntasFeitas, tema);
                     if (!perguntasFeitas.contains(pergunta.getPergunta())) {
                         perguntasFeitas.add(pergunta.getPergunta());
                         perguntaUnica = true;
