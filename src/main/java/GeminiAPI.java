@@ -1,15 +1,17 @@
+// java
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.URI;
 import java.util.Set;
+import java.util.regex.Pattern;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
 public class GeminiAPI {
-    public static Pergunta gerarPergunta(Set<String> perguntasFeitas, String tema) throws Exception {
+    public static Pergunta gerarPergunta(Set<String> perguntasFeitas, String tema, Set<String> palavrasProibidas) throws Exception {
         ObjectMapper mapper = new ObjectMapper();
         while (true) {
             try {
@@ -23,6 +25,8 @@ public class GeminiAPI {
                         prompt.append("\"").append(feita).append("\", ");
                     }
                 }
+              prompt.append(".");
+
 
                 ObjectNode part = mapper.createObjectNode();
                 part.put("text", prompt.toString());
@@ -80,11 +84,33 @@ public class GeminiAPI {
                     opcoes[i] = opcoesNode.get(i).asText();
                 }
 
+                if (containsProibida(pergunta, palavrasProibidas) ||
+                        containsProibida(resposta, palavrasProibidas) ||
+                        anyOptionContainsProibida(opcoes, palavrasProibidas)) {
+                    continue; // rejeita e tenta novamente
+                }
+
                 return new Pergunta(pergunta, resposta, opcoes);
             } catch (Exception e) {
                 continue;
             }
         }
     }
+
+    private static boolean containsProibida(String texto, Set<String> proibidas) {
+        if (texto == null || proibidas == null || proibidas.isEmpty()) return false;
+        for (String p : proibidas) {
+            Pattern pat = Pattern.compile("\\b" + Pattern.quote(p) + "\\b", Pattern.CASE_INSENSITIVE);
+            if (pat.matcher(texto).find()) return true;
+        }
+        return false;
     }
 
+    private static boolean anyOptionContainsProibida(String[] opcoes, Set<String> proibidas) {
+        if (opcoes == null || proibidas == null || proibidas.isEmpty()) return false;
+        for (String op : opcoes) {
+            if (containsProibida(op, proibidas)) return true;
+        }
+        return false;
+    }
+}

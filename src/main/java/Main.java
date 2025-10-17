@@ -1,3 +1,4 @@
+// java
 import java.util.HashSet;
 import java.util.Scanner;
 import java.util.Set;
@@ -6,13 +7,26 @@ public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         Set<String> perguntasFeitas = new HashSet<>();
+        Set<String> palavrasProibidas = ForbiddenWords.getDefault();
         int pontos = 0;
 
         System.out.print("Digite seu nome: ");
         String nome = scanner.nextLine().trim();
 
-        System.out.print("Digite o tema do quiz: ");
-        String tema = scanner.nextLine().trim();
+        String tema;
+        while (true) {
+            System.out.print("Digite o tema do quiz: ");
+            tema = scanner.nextLine().trim();
+            if (tema.isEmpty()) {
+                System.out.println("Tema vazio. Tente novamente.");
+                continue;
+            }
+            if (ForbiddenWords.containsProibida(tema)) {
+                System.out.println("Tema inválido — contém palavras proibidas. Digite outro tema.");
+                continue;
+            }
+            break;
+        }
 
         while (true) {
             Pergunta pergunta = null;
@@ -22,7 +36,7 @@ public class Main {
 
             while (tentativas < maxTentativas) {
                 try {
-                    pergunta = GeminiAPI.gerarPergunta(perguntasFeitas, tema);
+                    pergunta = GeminiAPI.gerarPergunta(perguntasFeitas, tema, palavrasProibidas);
                     if (!perguntasFeitas.contains(pergunta.getPergunta())) {
                         perguntasFeitas.add(pergunta.getPergunta());
                         perguntaUnica = true;
@@ -61,7 +75,7 @@ public class Main {
 
             if (respostaUsuario.equals(letraCorreta)) {
                 System.out.println("Correto!\n");
-                pontos++;
+                pontos = pontos + 100;
             } else {
                 System.out.println("Errado! A resposta correta era: " + letraCorreta);
                 break;
