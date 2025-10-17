@@ -15,7 +15,9 @@ public class Main {
 
         String tema;
         while (true) {
-            System.out.print("Digite o tema do quiz: ");
+            System.out.print("""
+                    Escreva qual tema você quer para o quiz 
+                    (Tema de escolha livre): """);
             tema = scanner.nextLine().trim();
             if (tema.isEmpty()) {
                 System.out.println("Tema vazio. Tente novamente.");

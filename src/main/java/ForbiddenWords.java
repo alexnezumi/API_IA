@@ -12,7 +12,7 @@ public final class ForbiddenWords {
                 "porra", "caralho", "fdp", "pqp", "filha da puta", "rola",
                 "vagina", "buceta", "cu", "merda", "scat", "criolo", "prostituta", "puta que pariu", "sexo",
                 "preto macaco", "bicha", "boila", "viado", "negro macaco", "rapariga", "pretinho raça ruim",
-                "cabelo duro", "mother fuck", "beijo grego"
+                "cabelo duro", "mother fuck", "beijo grego","bixa"
         ));
     }
 
